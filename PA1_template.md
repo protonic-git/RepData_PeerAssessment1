@@ -53,7 +53,7 @@ hist(steps_day$totalSteps,
      xlab = "Total Steps in a Day")
 ```
 
-![plot of chunk mean steps per day](figure/mean steps per day-1.png)
+![](PA1_template_files/figure-html/mean steps per day-1.png)<!-- -->
 
 ```r
 meanSteps <- as.character(round(mean(steps_day$totalSteps), 2))
@@ -80,7 +80,7 @@ plot(x = avgSteps_day$interval,
      )
 ```
 
-![plot of chunk avg daily activity](figure/avg daily activity-1.png)
+![](PA1_template_files/figure-html/avg daily activity-1.png)<!-- -->
 
 ```r
 maxTime <- format(avgSteps_day[avgSteps_day$avgSteps == max(avgSteps_day$avgSteps),]$interval, format = "%H:%M:%S")
@@ -117,7 +117,7 @@ hist(imputed_steps_day$totalSteps,
      xlab = "Total Steps in a Day")
 ```
 
-![plot of chunk imputation](figure/imputation-1.png)
+![](PA1_template_files/figure-html/imputation-1.png)<!-- -->
 
 ```r
 imputedMeanSteps <- as.character(round(mean(imputed_steps_day$totalSteps), 2))
@@ -159,5 +159,5 @@ xyplot(avgSteps ~ factor(interval) | day,
        )
 ```
 
-![plot of chunk weekday/weekend analysis](figure/weekday/weekend analysis-1.png)
+![](PA1_template_files/figure-html/weekday/weekend analysis-1.png)<!-- -->
 
