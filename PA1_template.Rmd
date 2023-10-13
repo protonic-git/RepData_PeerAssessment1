@@ -5,7 +5,7 @@ output:
     keep_md: true
 ---
 
-```{r Loading libraries, echo=TRUE}
+```{r Loading_libraries, echo=TRUE}
 library(dplyr)
 library(lattice)
 ```
@@ -13,7 +13,7 @@ library(lattice)
 ## Loading and preprocessing the data
   
   
-```{r Loading & Preprocessing Data, echo=TRUE}
+```{r Loading_Preprocessing_Data, echo=TRUE}
 data <- read.csv(unz(description = "activity.zip", filename = "activity.csv"), header = TRUE)
 
 # Make interval into a proper 4 digit time (HHMM)
@@ -40,7 +40,7 @@ data$interval <- strptime(data$interval, format = "%H%M")
 ## What is mean total number of steps taken per day?
   
   
-```{r mean steps per day, echo=TRUE}
+```{r mean_steps_per_day, echo=TRUE}
 steps_day <- data[!is.na(data$steps),] %>% 
   group_by(date) %>% 
   summarize(totalSteps = sum(steps))
@@ -60,7 +60,7 @@ medianSteps <- as.character(round(median(steps_day$totalSteps), 2))
   
 ## What is the average daily activity pattern?
 
-```{r avg daily activity, echo=TRUE}
+```{r avg_daily_activity, echo=TRUE}
 avgSteps_day <- data[!is.na(data$steps),] %>% 
   group_by(interval) %>% 
   summarize(avgSteps = mean(steps))
@@ -117,7 +117,7 @@ The imputation has changed the data but only slightly. With rounding, the mean i
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r weekday analysis, fig.height=8, echo=TRUE}
+```{r weekday_analysis, fig.height=8, echo=TRUE}
 imputed_data$day <- weekdays(imputed_data$date)
 imputed_data[(imputed_data$day == "Saturday") | (imputed_data$day == "Sunday"),]$day <- "weekend"
 imputed_data[imputed_data$day != "weekend",]$day <- "weekday"

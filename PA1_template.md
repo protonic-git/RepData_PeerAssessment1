@@ -53,7 +53,7 @@ hist(steps_day$totalSteps,
      xlab = "Total Steps in a Day")
 ```
 
-![plot of chunk mean steps per day](figure/mean steps per day-1.png)
+![plot of chunk mean_steps_per_day](figure/mean_steps_per_day-1.png)
 
 ```r
 meanSteps <- as.character(round(mean(steps_day$totalSteps), 2))
@@ -80,7 +80,7 @@ plot(x = avgSteps_day$interval,
      )
 ```
 
-![plot of chunk avg daily activity](figure/avg daily activity-1.png)
+![plot of chunk avg_daily_activity](figure/avg_daily_activity-1.png)
 
 ```r
 maxTime <- format(avgSteps_day[avgSteps_day$avgSteps == max(avgSteps_day$avgSteps),]$interval, format = "%H:%M:%S")
@@ -159,5 +159,5 @@ xyplot(avgSteps ~ factor(interval) | day,
        )
 ```
 
-![plot of chunk weekday analysis](figure/weekday analysis-1.png)
+![plot of chunk weekday_analysis](figure/weekday_analysis-1.png)
 
