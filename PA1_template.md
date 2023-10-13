@@ -159,5 +159,5 @@ xyplot(avgSteps ~ factor(interval) | day,
        )
 ```
 
-![plot of chunk weekday/weekend analysis](figure/weekday/weekend analysis-1.png)
+![plot of chunk weekday analysis](figure/weekday analysis-1.png)
 

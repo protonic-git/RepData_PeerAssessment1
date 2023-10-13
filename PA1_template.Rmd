@@ -117,7 +117,7 @@ The imputation has changed the data but only slightly. With rounding, the mean i
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r weekday/weekend analysis, fig.height=8, echo=TRUE}
+```{r weekday analysis, fig.height=8, echo=TRUE}
 imputed_data$day <- weekdays(imputed_data$date)
 imputed_data[(imputed_data$day == "Saturday") | (imputed_data$day == "Sunday"),]$day <- "weekend"
 imputed_data[imputed_data$day != "weekend",]$day <- "weekday"
