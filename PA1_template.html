@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Reproducible Research: Peer Assessment 1</title>
+<style type="text/css">
+/**
+ * Prism.s theme ported from highlight.js's xcode style
+ */
+pre code {
+  padding: 1em;
+}
+.token.comment {
+  color: #007400;
+}
+.token.punctuation {
+  color: #999;
+}
+.token.tag,
+.token.selector {
+  color: #aa0d91;
+}
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol {
+  color: #1c00cf;
+}
+.token.property,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin {
+  color: #c41a16;
+}
+.token.inserted {
+  background-color: #ccffd8;
+}
+.token.deleted {
+  background-color: #ffebe9;
+}
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #9a6e3a;
+}
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #836c28;
+}
+.token.function,
+.token.class-name {
+  color: #DD4A68;
+}
+.token.regex,
+.token.important,
+.token.variable {
+  color: #5c2699;
+}
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+</style>
+<style type="text/css">
+body {
+  font-family: sans-serif;
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+body, .footnotes, code { font-size: .9em; }
+li li { font-size: .95em; }
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+pre, img { max-width: 100%; }
+pre, pre:hover {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+pre code {
+  display: block;
+  overflow-x: auto;
+}
+code { font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace; }
+:not(pre) > code, code[class] { background-color: #F8F8F8; }
+code.language-undefined, pre > code:not([class]) {
+  background-color: inherit;
+  border: 1px solid #eee;
+}
+table {
+  margin: auto;
+  border-top: 1px solid #666;
+}
+table thead th { border-bottom: 1px solid #ddd; }
+th, td { padding: 5px; }
+thead, tfoot, tr:nth-child(even) { background: #eee; }
+blockquote {
+  color: #666;
+  margin: 0;
+  padding-left: 1em;
+  border-left: 0.5em solid #eee;
+}
+hr, .footnotes::before { border: 1px dashed #ddd; }
+.frontmatter { text-align: center; }
+#TOC .numbered li { list-style: none; }
+#TOC .numbered { padding-left: 0; }
+#TOC .numbered ul { padding-left: 1em; }
+table, .body h2 { border-bottom: 1px solid #666; }
+.body .appendix, .appendix ~ h2 { border-bottom-style: dashed; }
+.footnote-ref a::before { content: "["; }
+.footnote-ref a::after { content: "]"; }
+.footnotes::before {
+  content: "";
+  display: block;
+  max-width: 20em;
+}
+
+@media print {
+  body {
+    font-size: 12pt;
+    max-width: 100%;
+  }
+  tr, img { page-break-inside: avoid; }
+}
+@media only screen and (min-width: 992px) {
+  pre { white-space: pre; }
+}
+</style>
+</head>
+<body>
+<div class="include-before">
+</div>
+<div class="frontmatter">
+<div class="title"><h1>Reproducible Research: Peer Assessment 1</h1></div>
+<div class="author"><h2></h2></div>
+<div class="date"><h3></h3></div>
+</div>
+<div class="body">
+<pre><code class="language-r">library(dplyr)
+library(lattice)
+</code></pre>
+<h2 id="loading-and-preprocessing-the-data">Loading and preprocessing the data</h2>
+<pre><code class="language-r">data &lt;- read.csv(unz(description = &quot;activity.zip&quot;, filename = &quot;activity.csv&quot;), header = TRUE)
+
+# Make interval into a proper 4 digit time (HHMM)
+data$interval &lt;- paste0(mapply(function(x,y) paste0(rep(x,y), 
+                                                    collapse=&quot;&quot;
+                                                    ), 
+                               0, 
+                               4 - nchar(data$interval)
+                               ), 
+                        data$interval)
+
+# Make datetime object
+data$datetime &lt;- as.POSIXct(paste(data$date, data$interval, sep=&quot; &quot;), 
+                            format = &quot;%Y-%m-%d %H%M&quot;)
+
+# Convert date column into proper data type
+data$date &lt;- as.POSIXct(data$date, format = &quot;%Y-%m-%d&quot;)
+
+# Convert interval into proper data type
+data$interval &lt;- strptime(data$interval, format = &quot;%H%M&quot;)
+</code></pre>
+<h2 id="what-is-mean-total-number-of-steps-taken-per-day">What is mean total number of steps taken per day?</h2>
+<pre><code class="language-r">steps_day &lt;- data[!is.na(data$steps),] %&gt;% 
+  group_by(date) %&gt;% 
+  summarize(totalSteps = sum(steps))
+
+hist(steps_day$totalSteps, 
+     main = &quot;Steps per Day&quot;, 
+     xlab = &quot;Total Steps in a Day&quot;)
+</code></pre>
+<p>![plot of chunk mean steps per day](figure/mean steps per day-1.png)</p>
+<pre><code class="language-r">meanSteps &lt;- as.character(round(mean(steps_day$totalSteps), 2))
+medianSteps &lt;- as.character(round(median(steps_day$totalSteps), 2))
+</code></pre>
+<p><strong>Mean</strong> Total Steps per Day = <strong>10766.19</strong><br />
+<strong>Median</strong> Total Steps per Day = <strong>10765</strong></p>
+<h2 id="what-is-the-average-daily-activity-pattern">What is the average daily activity pattern?</h2>
+<pre><code class="language-r">avgSteps_day &lt;- data[!is.na(data$steps),] %&gt;% 
+  group_by(interval) %&gt;% 
+  summarize(avgSteps = mean(steps))
+
+plot(x = avgSteps_day$interval, 
+     y = avgSteps_day$avgSteps,
+     type = &quot;l&quot;, main = &quot;Average Number of Steps in Time Period&quot;,
+     xaxt = &quot;n&quot;, xlab = &quot;Time of Day&quot;, ylab = &quot;Avg. # of Steps&quot;
+     )
+</code></pre>
+<p>![plot of chunk avg daily activity](figure/avg daily activity-1.png)</p>
+<pre><code class="language-r">maxTime &lt;- format(avgSteps_day[avgSteps_day$avgSteps == max(avgSteps_day$avgSteps),]$interval, format = &quot;%H:%M:%S&quot;)
+avgSteps_day$interval &lt;- format(avgSteps_day$interval, 
+                                format=&quot;%H:%M:%S&quot;)
+avgSteps_day &lt;- as.data.frame(avgSteps_day)
+</code></pre>
+<p>The 5-minute interval with the highest number of steps averaged across all days is <strong>08:35:00</strong></p>
+<h2 id="imputing-missing-values">Imputing missing values</h2>
+<p>We will use the average values per interval (averaged over each day) to fill in the missing step values.</p>
+<pre><code class="language-r">missingRows &lt;- sum(is.na(data$steps))
+
+# We will impute with the interval average
+imputed_data &lt;- data
+imputed_data$interval &lt;- format(imputed_data$interval, 
+                                format = &quot;%H:%M:%S&quot;)
+for (intrvl in avgSteps_day$interval) {
+  imputed_data[(is.na(imputed_data$steps)) &amp; (imputed_data$interval == intrvl),]$steps = avgSteps_day[avgSteps_day$interval == intrvl,]$avgSteps
+}
+
+imputed_steps_day &lt;- imputed_data %&gt;% 
+  group_by(date) %&gt;% 
+  summarize(totalSteps = sum(steps))
+
+hist(imputed_steps_day$totalSteps, 
+     main = &quot;Steps per Day (Imputed Dataset)&quot;, 
+     xlab = &quot;Total Steps in a Day&quot;)
+</code></pre>
+<p><img src="data:image/png;base64,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" alt="plot of chunk imputation" /></p>
+<pre><code class="language-r">imputedMeanSteps &lt;- as.character(round(mean(imputed_steps_day$totalSteps), 2))
+imputedMedianSteps &lt;- as.character(round(median(imputed_steps_day$totalSteps), 2))
+</code></pre>
+<p><em><strong>After Imputation:</strong></em></p>
+<p><strong>Mean</strong> Total Steps per Day = <strong>10766.19</strong><br />
+<strong>Median</strong> Total Steps per Day = <strong>10766.19</strong></p>
+<p>The imputation has changed the data but only slightly. With rounding, the mean is unchanged. The median is slightly larger now but not noticeably so.</p>
+<h2 id="are-there-differences-in-activity-patterns-between-weekdays-and-weekends">Are there differences in activity patterns between weekdays and weekends?</h2>
+<pre><code class="language-r">imputed_data$day &lt;- weekdays(imputed_data$date)
+imputed_data[(imputed_data$day == &quot;Saturday&quot;) | (imputed_data$day == &quot;Sunday&quot;),]$day &lt;- &quot;weekend&quot;
+imputed_data[imputed_data$day != &quot;weekend&quot;,]$day &lt;- &quot;weekday&quot;
+
+avgSteps_weekday &lt;- as.data.frame(imputed_data[imputed_data$day==&quot;weekday&quot;,] %&gt;% 
+  group_by(interval) %&gt;% 
+  summarize(avgSteps = mean(steps)))
+avgSteps_weekday$day &lt;- &quot;weekday&quot;
+
+avgSteps_weekend &lt;- as.data.frame(imputed_data[imputed_data$day==&quot;weekend&quot;,] %&gt;% 
+  group_by(interval) %&gt;% 
+  summarize(avgSteps = mean(steps)))
+avgSteps_weekend$day &lt;- &quot;weekend&quot;
+
+plotData &lt;- rbind(avgSteps_weekday, avgSteps_weekend)
+
+xyplot(avgSteps ~ factor(interval) | day,
+       data = plotData, type = &quot;l&quot;,
+       ylab = &quot;Average number of steps&quot;,
+       xlab = &quot;Time of day&quot;
+       )
+</code></pre>
+<p>![plot of chunk weekday/weekend analysis](figure/weekday/weekend analysis-1.png)</p>
+</div>
+<div class="include-after">
+</div>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
+</body>
+</html>
